@@ -1,3 +1,27 @@
+import numpy as np
+
+import numpy as np
+
+def _get_distance_weights(dist):
+    """
+    Get the weights from an array of distances
+    Assume weights have already been validated
+
+    Parameters
+    ----------
+    dist : ndarray
+        The input distances
+    
+    weights : {'uniform', 'distance'}
+        The kind of weighting used
+
+    Returns
+    -------
+    weights_arr : array of the same shape as 'dist'
+        If weights=='uniform', then returns None
+    """
+    return 1.0/(dist**2)
+
 class NearestNeighbors:
     def __init__(self, n_neighbors=5, p=2):
         '''
@@ -12,7 +36,7 @@ class NearestNeighbors:
     
     def fit(self, X, y):
         '''
-        Storing the training input and output data
+        Storing the training input and output data as np arrays
         '''
         self._X = np.array(X)
         self._y = np.array(y)
@@ -43,14 +67,14 @@ class NearestNeighbors:
         indices: array-like of shape (n_samples, n_neighbors)
             The indices of the nearest neighbors.
 
-        Mechanisms:
+        Steps:
         - For each input data, find the distance to all the training data.
         - Sort the distances and get the indices of the k-nearest neighbors.
         - If return_distance is True, return the distances along with the indices.
         '''
 
         # creating an empty array to store the distances between query data and training data
-        # where tA = training data A, and qA = query data A, and d1
+        # where tA = training data A, and qA = query data A, and dAA = distance between query data A and training data A
         # example of top 3 nearest neighbors
         '''
             tA      tB      tC
@@ -64,10 +88,10 @@ class NearestNeighbors:
                 distances[i, j] = self._compute_distances(X[i], self._X[j])
 
         # sorting data
-        indices = np.argsort(distances, axis=1)
+        indices = np.argsort(distances, axis=1)[:,:self.n_neighbors]
 
         if return_distance:
-            sorted_distances = np.sort(distances, axis=1)
+            sorted_distances = np.sort(distances, axis=1)[:,:self.n_neighbors]
             return sorted_distances, indices
 
         return indices
